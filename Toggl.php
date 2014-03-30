@@ -41,7 +41,7 @@ class Toggl{
         if (self::$debug == true){
             echo 'API Token: ' . self::$token;
         }
-        if ($method == 'POST' || $method == 'PUT'){
+        if ($method == 'POST'){
             curl_setopt($curl, CURLOPT_POST, true);
             $params = json_encode($params);
             if (self::$debug == true){
@@ -52,6 +52,18 @@ class Toggl{
                     'Content-Type: application/json',
                     'Content-Length: ' . strlen($params),
             ));
+        }
+        if ($method == 'PUT'){
+            curl_setopt($curl, CURLOPT_PUT, true);
+            $params = json_encode($params);
+            if (self::$debug == true){
+                echo "PUT json: " . $params;
+            }
+            curl_setopt($curl, CURLOPT_POSTFIELDS, $params);
+            curl_setopt($curl, CURLOPT_HTTPHEADER, array(
+                                                        'Content-Type: application/json',
+                                                        'Content-Length: ' . strlen($params),
+                                                   ));
         }
         $result = curl_exec($curl);
         $info = curl_getinfo($curl);
