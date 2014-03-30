@@ -41,7 +41,7 @@ class Toggl{
         if (self::$debug == true){
             echo 'API Token: ' . self::$token;
         }
-        if ($method == 'POST'){
+        if ($method == 'POST' || $method == 'PUT'){
             curl_setopt($curl, CURLOPT_POST, true);
             $params = json_encode($params);
             if (self::$debug == true){
@@ -64,7 +64,6 @@ class Toggl{
             return $resultJson;
         } else {
             $errorMessage = 'Toggl API call failed -- Request URL: ' . $url . (is_string($params)? ' Request Data: ' . $params : null) . ' Response code: ' . $info['http_code'] . ' Raw response dump: ' . $result . ' serialized CURL info: ' . serialize($info);
-            CakeLog::write('error', $errorMessage);
             throw new Exception($errorMessage);
         }
     }

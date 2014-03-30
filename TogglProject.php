@@ -26,6 +26,19 @@ class TogglProject extends Toggl{
         return self::send($params);
     }
 
+    public static function updateProject($project_id, array $params = array()){
+        foreach ($params as $name => $param){
+            if (array_search($name, self::$fields) === false){
+                return "Invalid Parameter: $name";
+            }
+            $params["project"][$name] = $param;
+            unset($params[$name]);
+        }
+        $params['method'] = "PUT";
+        $params['url'] = "https://www.toggl.com/api/v8/projects/$project_id";
+        return self::send($params);
+    }
+
     public static function getProjectData($project_id, array $params = array()){
         foreach ($params as $name => $param){
             if (array_search($name, self::$fields) === false){
