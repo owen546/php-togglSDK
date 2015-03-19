@@ -23,6 +23,22 @@ class TogglClient extends Toggl{
         return self::send($params);
     }
 
+    public static function updateAClient($id,array $params = array()){
+        if (!is_numeric($id)) {
+            return 'Invalid Client ID';
+        }
+        foreach ($params as $name => $param){
+            if (array_search($name, self::$fields) === false){
+                return "Invalid Parameter: $name";
+            }
+            $params["client"][$name] = $param;
+            unset($params[$name]);
+        }
+        $params['method'] = "PUT";
+        $params['url'] = "https://www.toggl.com/api/v8/clients/".(string)$id;
+        return self::send($params);
+    }
+
     public static function getClientDetails($client_id, array $params = array()){
         foreach ($params as $name => $param){
             if (array_search($name, self::$fields) === false){

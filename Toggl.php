@@ -53,6 +53,19 @@ class Toggl{
                     'Content-Length: ' . strlen($params),
             ));
         }
+        if ($method == 'PUT'){
+            curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "PUT");
+            $params = json_encode($params);
+            if (self::$debug == true){
+                echo "PUT json: " . $params;
+            }
+
+            curl_setopt($curl, CURLOPT_POSTFIELDS, $params);
+            curl_setopt($curl, CURLOPT_HTTPHEADER, array(
+                    'Content-Type: application/json',
+                    'Content-Length: ' . strlen($params),
+            ));
+        }
         $result = curl_exec($curl);
         $info = curl_getinfo($curl);
         curl_close($curl);
@@ -64,7 +77,6 @@ class Toggl{
             return $resultJson;
         } else {
             $errorMessage = 'Toggl API call failed -- Request URL: ' . $url . (is_string($params)? ' Request Data: ' . $params : null) . ' Response code: ' . $info['http_code'] . ' Raw response dump: ' . $result . ' serialized CURL info: ' . serialize($info);
-            CakeLog::write('error', $errorMessage);
             throw new Exception($errorMessage);
         }
     }
