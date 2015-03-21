@@ -29,6 +29,19 @@ class TogglTimeEntry extends Toggl{
         return self::send($params);
     }
 
+    public static function updateATimeEntry($time_entry_id,array $params = array()){
+        foreach ($params as $name => $param){
+            if (array_search($name, self::$fields) === false){
+                return "Invalid Parameter: $name";
+            }
+            $params["time_entry"][$name] = $param;
+            unset($params[$name]);
+        }
+        $params['method'] = "PUT";
+        $params['url'] = "https://www.toggl.com/api/v8/time_entries/".(string)$time_entry_id;
+        return self::send($params);
+    }
+
     public static function startATimeEntry(array $params = array()){
         foreach ($params as $name => $param){
             if (array_search($name, self::$fields) === false){

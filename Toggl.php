@@ -2,6 +2,7 @@
 require_once('Classloader.php');
 $classLoader = new Toggl_Classloader();
 spl_autoload_register(array(&$classLoader, "loadClass"));
+use \Exception;
 class Toggl{
     /*
      * API URL parts
@@ -60,7 +61,9 @@ class Toggl{
                                                    ));
         }
         $result = curl_exec($curl);
-        Debug::write( "Curl result: $result" );
+        if (self::$debug == true){
+            Debug::write( "Curl result: $result" );
+        }
         $info = curl_getinfo($curl);
         curl_close($curl);
         $resultJson = json_decode($result, true);
@@ -70,8 +73,11 @@ class Toggl{
             }
             return $resultJson;
         } else {
+
             $errorMessage = 'Toggl API call failed -- Request URL: ' . $url . (is_string($params)? ' Request Data: ' . $params : null) . ' Response code: ' . $info['http_code'] . ' Raw response dump: ' . $result . ' serialized CURL info: ' . serialize($info);
-            throw new Exception($errorMessage);
+            
+            throw new \Exception($errorMessage, $info['http_code']);
+            
         }
     }
     public static function send($params = array()) {
@@ -84,6 +90,6 @@ class Toggl{
 class Debug {
     public static function write( $message )
     {
-        eZDebug::writeDebug( $message );
+        echo $message;
     }
 }
