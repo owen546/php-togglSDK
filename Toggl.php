@@ -1,34 +1,29 @@
 <?php
 require_once('Classloader.php');
-
 $classLoader = new Toggl_Classloader();
 spl_autoload_register(array(&$classLoader, "loadClass"));
-
 class Toggl{
-
     /*
      * API URL parts
      */
     private static $token;
     public static $debug = false;
     public static $verifyPeer = true;
-
     public static function setKey($apiKey) {
         self::$token = $apiKey;
     }
     public static function verifyPeer($bool){
         self::$verifyPeer = $bool;
     }
-
     private static function sendWithAuth($params) {
         $url = $params['url'];
         if (self::$debug == true){
-            echo 'Request URL: ' . $url;
+            Debug::write( 'Request URL: ' . $url );
         }
         unset($params['url']);
         $method = $params['method'];
         if (self::$debug == true){
-            echo 'Request method: ' . $method;
+            Debug::write( 'Request method: ' . $method );
         }
         unset($params['method']);
         $curl = curl_init($url);
@@ -37,15 +32,14 @@ class Toggl{
         if (self::$verifyPeer == false){
             curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
         }
-
         if (self::$debug == true){
-            echo 'API Token: ' . self::$token;
+            Debug::write( 'API Token: ' . self::$token );
         }
         if ($method == 'POST'){
             curl_setopt($curl, CURLOPT_POST, true);
             $params = json_encode($params);
             if (self::$debug == true){
-                echo "POST json: " . $params;
+                Debug::write( "POST json: " . $params );
             }
             curl_setopt($curl, CURLOPT_POSTFIELDS, $params);
             curl_setopt($curl, CURLOPT_HTTPHEADER, array(
@@ -57,16 +51,16 @@ class Toggl{
             curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "PUT");
             $params = json_encode($params);
             if (self::$debug == true){
-                echo "PUT json: " . $params;
+                Debug::write( "PUT json: " . $params );
             }
-
             curl_setopt($curl, CURLOPT_POSTFIELDS, $params);
             curl_setopt($curl, CURLOPT_HTTPHEADER, array(
-                    'Content-Type: application/json',
-                    'Content-Length: ' . strlen($params),
-            ));
+                                                        'Content-Type: application/json',
+                                                        'Content-Length: ' . strlen($params),
+                                                   ));
         }
         $result = curl_exec($curl);
+        Debug::write( "Curl result: $result" );
         $info = curl_getinfo($curl);
         curl_close($curl);
         $resultJson = json_decode($result, true);
@@ -80,13 +74,16 @@ class Toggl{
             throw new Exception($errorMessage);
         }
     }
-
     public static function send($params = array()) {
         return self::sendWithAuth($params);
     }
-
     public static function checkConnection(){
         TogglUser::getCurrentUserData();
     }
-
+}
+class Debug {
+    public static function write( $message )
+    {
+        eZDebug::writeDebug( $message );
+    }
 }

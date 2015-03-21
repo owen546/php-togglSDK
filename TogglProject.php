@@ -11,6 +11,9 @@ class TogglProject extends Toggl{
         "template_id", // id of the template project used on current project's creation
         "billable", // whether the project is billable or not (boolean, default true, available only for pro workspaces)
         "at", // timestamp that is sent in the response for PUT, indicates the time task was last updated
+        "color", //id of the color selected for the project
+        "rate",  //hourly rate of the project (float, not required, premium functionality)
+        "auto_estimates", //whether the esitamated hours is calculated based on task esimations or is fixed manually(boolean, default false, not required, premium functionality)
     );
 
     public static function createProject(array $params = array()){
@@ -23,6 +26,19 @@ class TogglProject extends Toggl{
         }
         $params['method'] = "POST";
         $params['url'] = "https://www.toggl.com/api/v8/projects";
+        return self::send($params);
+    }
+
+    public static function updateProject($project_id, array $params = array()){
+        foreach ($params as $name => $param){
+            if (array_search($name, self::$fields) === false){
+                return "Invalid Parameter: $name";
+            }
+            $params["project"][$name] = $param;
+            unset($params[$name]);
+        }        
+        $params['method'] = "PUT";
+        $params['url'] = "https://www.toggl.com/api/v8/projects/$project_id";
         return self::send($params);
     }
 
