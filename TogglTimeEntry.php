@@ -14,6 +14,7 @@ class TogglTimeEntry extends Toggl{
         "tags", // a list of tag names (array of strings, not required)
         "duronly", // should Toggl show the start and stop time of this time entry? (boolean, not required)
         "at", // timestamp that is sent in the response, indicates the time item was last updated
+        "tag_action", // add or remove - what to do when bulk updating tags
     );
 
     public static function createATimeEntry(array $params = array()){
@@ -85,6 +86,18 @@ class TogglTimeEntry extends Toggl{
         }
         $params['method'] = "GET";
         $params['url'] = "https://www.toggl.com/api/v8/time_entries";
+        return self::send($params);
+    }
+
+    public static function bulkUpdateTimeEntriesTags(array $time_entry_ids,array $params = array()){
+        $time_entry_ids = implode(",",$time_entry_ids);
+        foreach ($params as $name => $param){
+            if (array_search($name, self::$fields) === false){
+                return "Invalid Parameter: $name";
+            }
+        }
+        $params['method'] = "PUT";
+        $params['url'] = "https://www.toggl.com/api/v8/time_entries/$time_entry_ids";
         return self::send($params);
     }
 }
