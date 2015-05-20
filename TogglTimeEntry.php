@@ -91,10 +91,13 @@ class TogglTimeEntry extends Toggl{
 
     public static function bulkUpdateTimeEntriesTags(array $time_entry_ids,array $params = array()){
         $time_entry_ids = implode(",",$time_entry_ids);
+
         foreach ($params as $name => $param){
             if (array_search($name, self::$fields) === false){
                 return "Invalid Parameter: $name";
             }
+            $params["time_entry"][$name] = $param;
+            unset($params[$name]);
         }
         $params['method'] = "PUT";
         $params['url'] = "https://www.toggl.com/api/v8/time_entries/$time_entry_ids";
